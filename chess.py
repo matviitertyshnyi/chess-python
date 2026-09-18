@@ -2,7 +2,7 @@ import sys
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QMouseEvent, QPaintEvent, QPainter
+from PySide6.QtGui import QMouseEvent, QPaintEvent, QPainter, QPen, QFont
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -15,6 +15,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.label.setPixmap(canvas)
         self.setCentralWidget(self.label)
         self.draw_chessboard()
+        self.board_state = [
+            ["r", "n", "b", "q", "k", "b", "n", "r"],
+            ["p", "p", "p", "p", "p", "p", "p", "p"],
+            [".", ".", ".", ".", ".", ".", ".", "."],
+            [".", ".", ".", ".", ".", ".", ".", "."],
+            [".", ".", ".", ".", ".", ".", ".", "."],
+            [".", ".", ".", ".", ".", ".", ".", "."],
+            ["P", "P", "P", "P", "P", "P", "P", "P"],
+            ["R", "N", "B", "Q", "K", "B", "N", "R"]
+        ]
     '''   
     def mousePressEvent(self, event: QMouseEvent):
 
@@ -48,7 +58,7 @@ class MainWindow(QtWidgets.QMainWindow):
             canvas = self.label.pixmap()
             painter = QtGui.QPainter(canvas)
             painter.setBrush(QtGui.QBrush(Qt.GlobalColor.black))
-            painter.drawEllipse(x, y, 10,10)
+            painter.drawEllipse(((col*64)+27), ((row*64)+27), 10,10)
             painter.end()
             self.label.setPixmap(canvas)
 
@@ -79,10 +89,28 @@ class MainWindow(QtWidgets.QMainWindow):
         painter.end()
         self.label.setPixmap(canvas)
         
+    def get_all_pieces(p):
+        for piece, value in p.items():
+            yield piece
+            if isinstance(value, dict):
+                yield from get_all_pieces(value)
+
+    def draw_chess_pieces(self):
+        canvas = self.label.pixmap()
+        painter = QPainter(canvas)
+        painter.setPen(QPen(Qt.GlobalColor.black))
+        font = QFont("Arial", 20, QFont.Weight.Bold)
+        painter.setFont(font)
+        for x in self.get_all_pieces(self.board_state):
+            painter.drawText((x*64)+27, (x*64)+27, f"{self.board_state[(x)]}")
+        painter.end()
+        self.label.setPixmap(canvas)
     
 
 app = QtWidgets.QApplication(sys.argv)
 window = MainWindow()
 window.show()
+window.draw_chess_pieces()
 app.exec()
+
 
