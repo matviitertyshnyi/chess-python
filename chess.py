@@ -25,34 +25,6 @@ class MainWindow(QtWidgets.QMainWindow):
             ["P", "P", "P", "P", "P", "P", "P", "P"],
             ["R", "N", "B", "Q", "K", "B", "N", "R"]
         ]
-    '''   
-    def mousePressEvent(self, event: QMouseEvent):
-
-        self.previous_pos = event.position().toPoint()
-        QWidget.mousePressEvent(self, event)
-    ''' 
-    ''''
-    def mouseMoveEvent(self, event: QMouseEvent):
-
-        current_pos = event.position().toPoint()
-        self.painter.begin(self.pixmap)
-        self.painter.setRenderHints(QPainter.RenderHint.Antialiasing, True)
-        self.painter.setPen(self.pen)
-        self.painter.drawLine(self.previous_pos, current_pos)
-        self.painter.end()
-
-        self.previous_pos = current_pos
-        self.update()
-
-        QWidget.mouseMoveEvent(self, event)
-    '''    
-    
-
-    '''
-    def mouseReleaseEvent(self, event: QMouseEvent):
-        self.previous_pos = None
-        QWidget.mouseReleaseEvent(self, event)
-    '''
     def draw_chessboard(self):
         canvas = self.label.pixmap()
         painter = QtGui.QPainter(canvas)
