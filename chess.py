@@ -47,20 +47,6 @@ class MainWindow(QtWidgets.QMainWindow):
         QWidget.mouseMoveEvent(self, event)
     '''    
     
-    def mousePressEvent(self, event):
-        x = int(event.position().x())
-        y = int(event.position().y())
-        
-        col = x // 64
-        row = y // 64
-        if event.button() == Qt.MouseButton.LeftButton:
-            print(f"u just left clicked {col, row}")
-            canvas = self.label.pixmap()
-            painter = QtGui.QPainter(canvas)
-            painter.setBrush(QtGui.QBrush(Qt.GlobalColor.black))
-            painter.drawEllipse(((col*64)+27), ((row*64)+27), 10,10)
-            painter.end()
-            self.label.setPixmap(canvas)
 
     '''
     def mouseReleaseEvent(self, event: QMouseEvent):
@@ -89,11 +75,10 @@ class MainWindow(QtWidgets.QMainWindow):
         painter.end()
         self.label.setPixmap(canvas)
         
-    def get_all_pieces(p):
-        for piece, value in p.items():
-            yield piece
-            if isinstance(value, dict):
-                yield from get_all_pieces(value)
+    def get_all_pieces(self):
+        for i in range(len(self.board_state)):
+            for j in range(len(self.board_state[i])):
+                yield i, j, self.board_state[i][j]
 
     def draw_chess_pieces(self):
         canvas = self.label.pixmap()
@@ -101,16 +86,31 @@ class MainWindow(QtWidgets.QMainWindow):
         painter.setPen(QPen(Qt.GlobalColor.black))
         font = QFont("Arial", 20, QFont.Weight.Bold)
         painter.setFont(font)
-        for x in self.get_all_pieces(self.board_state):
-            painter.drawText((x*64)+27, (x*64)+27, f"{self.board_state[(x)]}")
+        for i, j, piece in self.get_all_pieces():
+            painter.drawText((j*64)+27, (i*64)+27, f"{piece}")
         painter.end()
         self.label.setPixmap(canvas)
-    
+        
+    def mousePressEvent(self, event):
+        x = int(event.position().x())
+        y = int(event.position().y())
+        
+        col = (x // 64)+1
+        row = (y // 64)+1
+        if event.button() == Qt.MouseButton.LeftButton:
+            for i, j, piece in self.get_all_pieces():
+                if(self.board_state[col-1][row-1] == piece): 
+                    print(f"u just left clicked {col, row, piece}")
+            canvas = self.label.pixmap()
+            painter = QtGui.QPainter(canvas)
+            painter.setBrush(QtGui.QBrush(Qt.GlobalColor.black))
+            painter.drawEllipse((((col-1)*64)+27), (((row-1)*64)+27), 10,10)
+            painter.end()
+            self.label.setPixmap(canvas)
+
 
 app = QtWidgets.QApplication(sys.argv)
 window = MainWindow()
 window.show()
 window.draw_chess_pieces()
 app.exec()
-
-
