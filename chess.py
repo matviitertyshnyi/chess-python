@@ -78,6 +78,8 @@ class MainWindow(QtWidgets.QMainWindow):
         col = (x // 64)
         row = (y // 64)
         if event.button() == Qt.MouseButton.LeftButton:
+            self.draw_chessboard()
+            self.draw_chess_pieces()
             print(f"u just clicked {col+1, row+1, self.board_state[row][col]}")
             self.selected_square = (row, col)
             print(self.selected_square)
