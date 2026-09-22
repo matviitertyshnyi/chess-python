@@ -27,9 +27,10 @@ class MainWindow(QtWidgets.QMainWindow):
         ]
         self.selected_square = None
         self.piece_possible_moves = {
-            "p": [(0, 1), (0,2), (1,1), (-1, 1)],
-            "P":[(0, -1), (0,-2), (-1,-1), (1, -1)]
+            "p": [(0, 1), (0,2), ],
+            "P":[(0, -1), (0,-2),]
             }
+        self.current_possible_moves = [],
         
     def draw_chessboard(self):
         canvas = self.label.pixmap()
@@ -77,31 +78,62 @@ class MainWindow(QtWidgets.QMainWindow):
         
         col = (x // 64)
         row = (y // 64)
+        
         if event.button() == Qt.MouseButton.LeftButton:
-            self.draw_chessboard()
-            self.draw_chess_pieces()
-            print(f"u just clicked {col+1, row+1, self.board_state[row][col]}")
-            self.selected_square = (row, col)
-            print(self.selected_square)
-            self.calculate_possible_moves(row, col, self.board_state[row][col])
-            canvas = self.label.pixmap()
-            painter = QtGui.QPainter(canvas)
-            painter.setBrush(QtGui.QBrush(Qt.GlobalColor.black))
-            painter.drawEllipse((((col)*64)+27), (((row)*64)+27), 10,10)
-            painter.end()
-            self.label.setPixmap(canvas)
+            # handling the memory
+            
+            
+            chosen_piece = self.board_state[row][col]
+            if self.selected_square == None:
+                # if memory is empty and empty square is clicked -> do nothing
+                if chosen_piece == ".":
+                    return
+                
+                # if memory is empty but piece is clicked -> save coords to memory
+                self.selected_square = (row, row)
+                
+                # redraw the chessboard so the possible moves cannot stack, rendering
+                self.draw_chessboard()
+                self.draw_chess_pieces()
+                
+                print(f"u just clicked {row, col, chosen_piece}")
+                
+                self.calculate_possible_moves(row, col, chosen_piece)
+                
+                canvas = self.label.pixmap()
+                painter = QtGui.QPainter(canvas)
+                painter.setBrush(QtGui.QBrush(Qt.GlobalColor.black))
+                painter.end()
+                self.label.setPixmap(canvas)
+            # we try to move a piece here  
+            else: 
+                self.move_piece(row, col, chosen_piece)
+            
             
     def calculate_possible_moves(self, row, col, piece):
+        
+        self.current_possible_moves.clear()
+        
         for possible_x, possible_y in self.piece_possible_moves[piece]:
-            final_x = col + possible_x
-            final_y = row + possible_y
+            
+            final_x = row + possible_x
+            final_y = col + possible_y
+            
             print(f"Moves available for the {piece} are: {final_x}, {final_y}")
+            self.current_possible_moves.append((final_x, final_y))
             canvas = self.label.pixmap()
             painter = QtGui.QPainter(canvas)
             painter.setBrush(QtGui.QBrush(Qt.GlobalColor.black))
             painter.drawEllipse((((final_x)*64)+27), (((final_y)*64)+27), 10,10)
             painter.end()
             self.label.setPixmap(canvas)
+            
+    def move_piece(self, row, col, piece):
+            for x, y in self.calculate_possible_moves(self, row, col, piece):
+                available_x = x
+                available_y = y
+                return
+                
         
 
 app = QtWidgets.QApplication(sys.argv)
