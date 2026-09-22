@@ -79,10 +79,8 @@ class MainWindow(QtWidgets.QMainWindow):
         col = (x // 64)
         row = (y // 64)
         
+        # handling the clicks, memory, moves here
         if event.button() == Qt.MouseButton.LeftButton:
-            # handling the memory
-            
-            
             chosen_piece = self.board_state[row][col]
             if self.selected_square == None:
                 # if memory is empty and empty square is clicked -> do nothing
